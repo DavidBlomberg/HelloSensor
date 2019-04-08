@@ -16,7 +16,6 @@ import android.widget.TextView;
 public class CompassActivity extends AppCompatActivity implements SensorEventListener {
 
     ImageView compass_img;
-    ImageView ride_img;
     TextView txt_compass;
     MediaPlayer augh_sound;
     int mAzimuth;
@@ -37,7 +36,6 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         compass_img = (ImageView) findViewById(R.id.img_compass);
-        ride_img = (ImageView) findViewById(R.id.up);
         txt_compass = (TextView) findViewById(R.id.txt_azimuth);
         augh_sound = MediaPlayer.create(this, R.raw.augh);
 
@@ -46,6 +44,7 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+
         if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
             SensorManager.getRotationMatrixFromVector(rMat, event.values);
             mAzimuth = (int) (Math.toDegrees(SensorManager.getOrientation(rMat, orientation)[0]) + 360) % 360;
@@ -65,10 +64,32 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         }
 
         mAzimuth = Math.round(mAzimuth);
+        compass_img.setRotation(-mAzimuth);
 
-        effectNorth(mAzimuth);
-        displayWhere(mAzimuth);
+        String where = "NW";
+
+        if (mAzimuth >= 350 || mAzimuth <= 10) {
+            where = "N";
+            effectNorth();
+        }
+        if (mAzimuth < 350 && mAzimuth > 280)
+            where = "NW";
+        if (mAzimuth <= 280 && mAzimuth > 260)
+            where = "W";
+        if (mAzimuth <= 260 && mAzimuth > 190)
+            where = "SW";
+        if (mAzimuth <= 190 && mAzimuth > 170)
+            where = "S";
+        if (mAzimuth <= 170 && mAzimuth > 100)
+            where = "SE";
+        if (mAzimuth <= 100 && mAzimuth > 80)
+            where = "E";
+        if (mAzimuth <= 80 && mAzimuth > 10)
+            where = "NE";
+
+        txt_compass.setText(mAzimuth + "° " + where);
     }
+
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
@@ -79,25 +100,23 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         if (mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) == null) {
             if ((mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) == null) || (mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) == null)) {
                 noSensorsAlert();
-            }
-            else {
+            } else {
                 mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
                 mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
                 haveSensor = mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
                 haveSensor2 = mSensorManager.registerListener(this, mMagnetometer, SensorManager.SENSOR_DELAY_UI);
             }
-        }
-        else{
+        } else {
             mRotationV = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
             haveSensor = mSensorManager.registerListener(this, mRotationV, SensorManager.SENSOR_DELAY_UI);
         }
     }
 
-    public void noSensorsAlert(){
+    public void noSensorsAlert() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
         alertDialog.setMessage("Your device doesn't support the Compass.")
                 .setCancelable(false)
-                .setNegativeButton("Close",new DialogInterface.OnClickListener() {
+                .setNegativeButton("Close", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         finish();
                     }
@@ -108,8 +127,7 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
     public void stop() {
         if (haveSensor) {
             mSensorManager.unregisterListener(this, mRotationV);
-        }
-        else {
+        } else {
             mSensorManager.unregisterListener(this, mAccelerometer);
             mSensorManager.unregisterListener(this, mMagnetometer);
         }
@@ -127,43 +145,23 @@ public class CompassActivity extends AppCompatActivity implements SensorEventLis
         start();
     }
 
-    public void effectNorth(int azi){
-        compass_img.setRotation(-azi);
-        ride_img.setRotation(-azi);
+    public void effectNorth() {
+        if (augh_sound == null) {
+            augh_sound = MediaPlayer.create(this, R.raw.augh);
+            augh_sound.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    stopEffect();
+                }
+            });
+        }
+        augh_sound.start();
+    }
 
-        if(azi >= 350 || azi <= 10){
-            ride_img.setVisibility(View.VISIBLE);
-            compass_img.setVisibility(View.INVISIBLE);
-
-            augh_sound.start();
-        } else{
-            ride_img.setVisibility(View.INVISIBLE);
-            compass_img.setVisibility(View.VISIBLE);
+    public void stopEffect() {
+        if (augh_sound != null) {
+            augh_sound.release();
+            augh_sound = null;
         }
     }
-
-    public void displayWhere(int azi){
-        String where = "NW";
-
-        if (azi >= 350 || azi <= 10)
-            where = "N";
-        if (azi < 350 && azi > 280)
-            where = "NW";
-        if (azi <= 280 && azi > 260)
-            where = "W";
-        if (azi <= 260 && azi > 190)
-            where = "SW";
-        if (azi <= 190 && azi > 170)
-            where = "S";
-        if (azi <= 170 && azi > 100)
-            where = "SE";
-        if (azi <= 100 && azi > 80)
-            where = "E";
-        if (azi <= 80 && azi > 10)
-            where = "NE";
-
-
-        txt_compass.setText(azi + "° " + where);
-    }
-
 }

@@ -153,7 +153,7 @@ public class AccelerometerActivity extends AppCompatActivity implements SensorEv
     }
 
    public void playSound() {
-        if (deltaX > 20 || deltaY > 20 || deltaZ > 20) {
+        if (deltaX > 30 || deltaY > 30 || deltaZ > 30) {
             yuh_sound.start();
         }
 

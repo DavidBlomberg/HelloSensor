@@ -1,4 +1,4 @@
-#Wed Apr 03 19:19:18 CEST 2019
+#Mon Apr 08 21:30:26 CEST 2019
 base.0=C\:\\Users\\David Blomberg\\AndroidStudioProjects\\HelloSensor\\app\\build\\intermediates\\transforms\\dexMerger\\debug\\1
 path.0=classes.dex
 renamed.0=classes.dex
