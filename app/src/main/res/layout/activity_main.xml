@@ -10,8 +10,8 @@
     <Button
         style="@style/Widget.AppCompat.Button.Colored"
         android:id="@+id/button"
-        android:layout_width="150dp"
-        android:layout_height="40dp"
+        android:layout_width="300dp"
+        android:layout_height="80dp"
         android:layout_marginStart="32dp"
         android:layout_marginTop="300dp"
         android:onClick="showCompass"
@@ -22,9 +22,9 @@
     <Button
         style="@style/Widget.AppCompat.Button.Colored"
         android:id="@+id/button2"
-        android:layout_width="150dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="300dp"
+        android:layout_width="300dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="100dp"
         android:layout_marginEnd="32dp"
         android:onClick="showAccelerometer"
         android:text="Accelerometer"
